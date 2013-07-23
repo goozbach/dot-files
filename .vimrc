@@ -396,3 +396,82 @@ endfunction " MapHTMLKeys()
 
 
 set cursorline
+
+"======[ Magically build interim directories if necessary ]===================
+
+    function! AskQuit (msg, options, quit_option)
+        if confirm(a:msg, a:options) == a:quit_option
+            exit
+        endif
+    endfunction
+
+    function! EnsureDirExists ()
+        let required_dir = expand("%:h")
+        if !isdirectory(required_dir)
+            call AskQuit("Parent directory '" . required_dir . "' doesn't exist.",
+                \       "&Create it\nor &Quit?", 2)
+
+            try
+                call mkdir( required_dir, 'p' )
+            catch
+                call AskQuit("Can't create '" . required_dir . "'",
+                \            "&Quit\nor &Continue anyway?", 1)
+            endtry
+        endif
+    endfunction
+
+    augroup AutoMkdir
+        autocmd!
+        autocmd  BufNewFile  *  :call EnsureDirExists()
+    augroup END
+
+"====[ Mappings for eqalignsimple.vim (character-based alignments) ]===========
+
+    " Align contiguous lines at the same indent...
+    nmap <silent> =     :call CharAlign('nmap')<CR>
+    nmap <silent> +     :call CharAlign('nmap', {'cursor':1} )<CR>
+
+    " Align continuous lines in the same paragraph...
+    nmap <silent> ==    :call CharAlign('nmap', {'paragraph':1} )<CR>
+    nmap <silent> ++    :call CharAlign('nmap', {'cursor':1, 'paragraph':1} )<CR>
+
+    " Align continuous lines in the current visual block
+    vmap <silent> =     :call CharAlign('vmap')<CR>
+    vmap <silent> +     :call CharAlign('vmap', {'cursor':1} )<CR>
+
+
+"====[ Mapping for colalignsimple.vim (whitespace-based alignments) ]=======
+
+    " Align next unaligned multi-whitespace-delimited column...
+    nmap <silent> ]     :call WSColumnAlign()<CR>
+
+
+"====[ Mapping for smartcom.vim ("duplicate the above spacing) ]===============
+
+    " Search previous line for repeated punctuation and repeat it...
+    inoremap <silent> <S-TAB> <c-r><c-r>=CompletePadding()<CR>
+
+
+"====[ Switch on temporary column marker during Visual inserts and appends ]===
+
+    vnoremap <silent>  I  I<C-R>=TemporaryColumnMarkerOn()<CR>
+    vnoremap <silent>  A  A<C-R>=TemporaryColumnMarkerOn()<CR>
+
+    function! TemporaryColumnMarkerOn ()
+        let g:prev_cursorcolumn_state = g:cursorcolumn_visible ? 'on' : 'off'
+        set cursorcolumn
+        inoremap <silent>  <ESC>  <ESC>:call TemporaryColumnMarkerOff(g:prev_cursorcolumn_state)<CR>
+        return ""
+    endfunction
+
+    function! TemporaryColumnMarkerOff (newstate)
+        call Toggle_CursorColumn(a:newstate)
+        iunmap <ESC>
+    endfunction
+
+"====[ Shortcuts for global replacements ]=====================
+
+    nmap S :%s//g<LEFT><LEFT>
+    vmap S :s//g<LEFT><LEFT>
+
+
