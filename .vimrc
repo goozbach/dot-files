@@ -75,25 +75,25 @@ augroup gzip
   " Remove all gzip autocommands
   au!
 
-  " Enable editing of gzipped files
-  "	  read:	set binary mode before reading the file
-  "		uncompress text in buffer after reading
-  "	 write:	compress file after writing
-  "	append:	uncompress file, append, compress file
-  autocmd BufReadPre,FileReadPre	*.gz set bin
-  autocmd BufReadPre,FileReadPre	*.gz let ch_save = &ch|set ch=2
-  autocmd BufReadPost,FileReadPost	*.gz '[,']!gunzip
-  autocmd BufReadPost,FileReadPost	*.gz set nobin
-  autocmd BufReadPost,FileReadPost	*.gz let &ch = ch_save|unlet ch_save
-  autocmd BufReadPost,FileReadPost	*.gz execute ":doautocmd BufReadPost " . %:r
-
-  autocmd BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
-  autocmd BufWritePost,FileWritePost	*.gz !gzip <afile>:r
-
-  autocmd FileAppendPre			*.gz !gunzip <afile>
-  autocmd FileAppendPre			*.gz !mv <afile>:r <afile>
-  autocmd FileAppendPost		*.gz !mv <afile> <afile>:r
-  autocmd FileAppendPost		*.gz !gzip <afile>:r
+"   " Enable editing of gzipped files
+"   "	  read:	set binary mode before reading the file
+"   "		uncompress text in buffer after reading
+"   "	 write:	compress file after writing
+"   "	append:	uncompress file, append, compress file
+"   autocmd BufReadPre,FileReadPre	*.gz set bin
+"   autocmd BufReadPre,FileReadPre	*.gz let ch_save = &ch|set ch=2
+"   autocmd BufReadPost,FileReadPost	*.gz '[,']!gunzip
+"   autocmd BufReadPost,FileReadPost	*.gz set nobin
+"   autocmd BufReadPost,FileReadPost	*.gz let &ch = ch_save|unlet ch_save
+"   autocmd BufReadPost,FileReadPost	*.gz execute ":doautocmd BufReadPost " . %:r
+" 
+"   autocmd BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
+"   autocmd BufWritePost,FileWritePost	*.gz !gzip <afile>:r
+" 
+"   autocmd FileAppendPre			*.gz !gunzip <afile>
+"   autocmd FileAppendPre			*.gz !mv <afile>:r <afile>
+"   autocmd FileAppendPost		*.gz !mv <afile> <afile>:r
+"   autocmd FileAppendPost		*.gz !gzip <afile>:r
 augroup END
 
 augroup bzip2
@@ -210,6 +210,7 @@ nnoremap <Space> <PageDown>
 
 
 "=====[ Show help files in a new tab ]==============
+let g:help_in_tabs = 1
 
 "Only apply to .txt files...
 augroup HelpInTabs
@@ -217,6 +218,7 @@ augroup HelpInTabs
     autocmd BufEnter  *.txt   call HelpInNewTab()
 augroup END
 
+"TODO: Set g:help_in_tabs
 "Only apply to help files...
 function! HelpInNewTab ()
     if &buftype == 'help' && g:help_in_tabs
@@ -475,3 +477,4 @@ set cursorline
     vmap S :s//g<LEFT><LEFT>
 
 
+set matchpairs+=<:>
